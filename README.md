@@ -1,6 +1,6 @@
 # kafyx-3/laravel-datatables-export
 
-> CDN DataTables v2 + tombol Export (Copy, CSV, Excel, PDF, Print) untuk Laravel — **tanpa jQuery**, satu tag Blade di layout, langsung jalan.
+> CDN DataTables v2 + jQuery + tombol Export (Copy, CSV, Excel, PDF, Print) untuk Laravel — satu tag Blade di layout, langsung jalan.
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/kafyx-3/laravel-datatables-export.svg?style=flat-square)](https://packagist.org/packages/kafyx-3/laravel-datatables-export)
 [![Total Downloads](https://img.shields.io/packagist/dt/kafyx-3/laravel-datatables-export.svg?style=flat-square)](https://packagist.org/packages/kafyx-3/laravel-datatables-export)
@@ -12,15 +12,16 @@
 
 ## Apa ini?
 
-Package ini membuatmu **tidak perlu copy-paste CDN DataTables** di setiap halaman. Cukup taruh `<x-datatables-export::scripts />` sekali di layout, semua CDN termuat otomatis — CSS di `<head>`, JS di akhir `<body>` via `@pushOnce` tanpa double-load.
+Package ini membuatmu **tidak perlu copy-paste CDN DataTables** di setiap halaman. Cukup taruh `<x-datatables-export::scripts />` sekali di layout — jQuery, DataTables, JSZip, PDFMake, dan semua plugin Buttons termuat otomatis.
 
-Kamu tetap menulis `new DataTable(...)` sendiri, bebas konfigurasi apapun.
+Kamu tetap menulis `$('#id').DataTable(...)` sendiri, bebas konfigurasi apapun.
 
 **Sebelum pakai package ini:**
 ```html
 <!-- Di setiap halaman, copy-paste ini semua -->
 <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.5/css/buttons.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/3.2.5/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.html5.min.js"></script>
@@ -90,7 +91,7 @@ composer update kafyx-3/laravel-datatables-export
 
 ## Quick Start
 
-**1. Tambah `<x-datatables-export::scripts />` di layout dan pastikan ada `@stack('datatables-scripts')` dan `@stack('scripts')` sebelum `</body>`:**
+**1. Di layout, taruh `<x-datatables-export::scripts />` di `<head>` dan tambahkan dua stack sebelum `</body>`:**
 
 ```blade
 {{-- resources/views/layouts/app.blade.php --}}
@@ -100,47 +101,49 @@ composer update kafyx-3/laravel-datatables-export
     <meta charset="UTF-8">
     <title>@yield('title', 'App')</title>
 
-    <x-datatables-export::scripts />  {{-- CSS termuat di sini --}}
+    <x-datatables-export::scripts />  {{-- CSS DataTables termuat di sini --}}
 </head>
 <body>
     @yield('content')
 
-    @stack('datatables-scripts')  {{-- jQuery + DataTables CDN muncul di sini --}}
+    @stack('datatables-scripts')  {{-- jQuery + DataTables JS muncul di sini --}}
     @stack('scripts')             {{-- script inisialisasi halaman muncul di sini --}}
 </body>
 </html>
 ```
 
-**2. Di halaman, pakai component table dan tulis script inisialisasi:**
+> **Penting:** `@stack('datatables-scripts')` harus ada **sebelum** `@stack('scripts')` agar jQuery sudah termuat saat script inisialisasi dijalankan.
+
+**2. Di halaman, buat tabel dan tulis script inisialisasi di `@push('scripts')`:**
 
 ```blade
 @extends('layouts.app')
 
 @section('content')
-    <x-datatables-export::table id="tabelAlat" class="table table-bordered table-striped">
+    <table id="tabelKu" class="table table-bordered table-striped">
         <thead>
             <tr>
+                <th>#</th>
                 <th>Nama</th>
                 <th>Email</th>
-                <th>Tanggal</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($users as $user)
+            @foreach ($data as $item)
             <tr>
-                <td>{{ $user->name }}</td>
-                <td>{{ $user->email }}</td>
-                <td>{{ $user->created_at->format('d/m/Y') }}</td>
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ $item->name }}</td>
+                <td>{{ $item->email }}</td>
             </tr>
             @endforeach
         </tbody>
-    </x-datatables-export::table>
+    </table>
 @endsection
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    new DataTable('#tabelAlat', {
+$(document).ready(function () {
+    $('#tabelKu').DataTable({
         layout: {
             topStart: {
                 buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
@@ -159,9 +162,18 @@ document.addEventListener('DOMContentLoaded', function () {
 `<x-datatables-export::scripts />` melakukan dua hal:
 
 - **CSS** — langsung di-render di tempat tag dipasang (cocok di `<head>`)
-- **JS** — di-push ke `@stack('scripts')` via `@pushOnce`, muncul sebelum `</body>`, tidak double-load walau ada beberapa tabel di satu halaman
+- **JS** — di-push ke `@stack('datatables-scripts')` via `@pushOnce`, tidak double-load walau ada beberapa tabel di satu halaman
 
-`<x-datatables-export::table />` hanya render `<table>` HTML. **Tidak ada script inisialisasi yang otomatis diinjeksi.** Kamu tulis `new DataTable(...)` sendiri — bebas konfigurasi apapun.
+Urutan load JS yang dijamin oleh package:
+1. jQuery 3.7.1
+2. DataTables core
+3. JSZip (dependency Excel)
+4. PDFMake + vfs_fonts (dependency PDF)
+5. Buttons core
+6. Buttons HTML5 (CSV, Excel, Copy)
+7. Buttons Print
+
+`<x-datatables-export::table />` hanya render `<table>` HTML. **Tidak ada script inisialisasi yang otomatis diinjeksi.** Kamu tulis `$('#id').DataTable(...)` sendiri di `@push('scripts')`.
 
 ---
 
@@ -178,53 +190,60 @@ Tidak ada props. Taruh sekali di `<head>` layout.
 | `id` | `string` | — *(wajib)* | ID unik elemen `<table>`. Harus unik per halaman. |
 | `class` | `string` | `display` | Class CSS pada `<table>`. Bisa dikombinasi dengan Bootstrap, dll. |
 
+> `<x-datatables-export::table>` dan `<table>` biasa hasilnya identik di HTML — bebas pilih mana yang lebih nyaman.
+
 ---
 
 ## Contoh
 
-### Kolom Gambar + Aksi tidak ikut ekspor
-
-Gunakan `exportOptions.columns` di tiap button untuk memilih kolom mana saja yang masuk file ekspor:
+### Tabel lengkap dengan Gambar + Aksi tidak ikut ekspor
 
 ```blade
-<x-datatables-export::table id="tabelAlat" class="table table-bordered table-striped align-middle">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Nama Alat</th>
-            <th>Gambar Alat</th>
-            <th>Keterangan</th>
-            <th>Kategori</th>
-            <th>Stok</th>
-            <th>Aksi</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($alat as $a)
-        <tr>
-            <td>{{ $loop->iteration }}</td>
-            <td>{{ $a->nama_alat }}</td>
-            <td>
-                @if ($a->gambar_alat)
-                <img src="{{ asset('storage/' . $a->gambar_alat) }}" width="80">
-                @endif
-            </td>
-            <td>{{ $a->keterangan_alat }}</td>
-            <td>{{ $a->kategori->nama_kategori }}</td>
-            <td>{{ $a->stok }}</td>
-            <td>
-                <a href="{{ route('alat.edit', $a->id) }}" class="btn btn-sm btn-warning">Edit</a>
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
-</x-datatables-export::table>
+@extends('layouts.app')
+
+@section('content')
+<div class="container mt-4">
+    <x-datatables-export::table id="tabelAlat" class="table table-bordered table-striped align-middle">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Nama Alat</th>
+                <th>Gambar Alat</th>
+                <th>Keterangan</th>
+                <th>Kategori</th>
+                <th>Stok</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($alat as $a)
+            <tr>
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ $a->nama_alat }}</td>
+                <td>
+                    @if ($a->gambar_alat)
+                    <img src="{{ asset('storage/' . $a->gambar_alat) }}" width="80">
+                    @endif
+                </td>
+                <td>{{ $a->keterangan_alat }}</td>
+                <td>{{ $a->kategori->nama_kategori }}</td>
+                <td>{{ $a->stok }}</td>
+                <td>
+                    <a href="{{ route('alat.edit', $a->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{{ route('alat.destroy', $a->id) }}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </x-datatables-export::table>
+</div>
+@endsection
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+$(document).ready(function () {
     // Kolom indeks 2 (Gambar) dan 6 (Aksi) tidak ikut ekspor
-    new DataTable('#tabelAlat', {
+    $('#tabelAlat').DataTable({
         layout: {
             topStart: {
                 buttons: [
@@ -245,40 +264,44 @@ document.addEventListener('DOMContentLoaded', function () {
 ### Custom judul dan nama file ekspor
 
 ```js
-new DataTable('#myTable', {
-    layout: {
-        topStart: {
-            buttons: [
-                {
-                    extend: 'excel',
-                    text: 'Download Excel',
-                    title: 'Laporan Data Pengguna',
-                    filename: 'laporan-pengguna',
-                    exportOptions: { columns: [0, 1, 2] }
-                },
-                {
-                    extend: 'pdf',
-                    text: 'Download PDF',
-                    title: 'Laporan Data Pengguna',
-                    filename: 'laporan-pengguna',
-                    exportOptions: { columns: [0, 1, 2] }
-                }
-            ]
+$(document).ready(function () {
+    $('#myTable').DataTable({
+        layout: {
+            topStart: {
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: 'Download Excel',
+                        title: 'Laporan Data Pengguna',
+                        filename: 'laporan-pengguna',
+                        exportOptions: { columns: [0, 1, 2] }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: 'Download PDF',
+                        title: 'Laporan Data Pengguna',
+                        filename: 'laporan-pengguna',
+                        exportOptions: { columns: [0, 1, 2] }
+                    }
+                ]
+            }
         }
-    }
+    });
 });
 ```
 
 ### Tombol di bawah tabel
 
 ```js
-new DataTable('#myTable', {
-    layout: {
-        topStart: null,
-        bottomStart: {
-            buttons: ['excel', 'pdf', 'print']
+$(document).ready(function () {
+    $('#myTable').DataTable({
+        layout: {
+            topStart: null,
+            bottomStart: {
+                buttons: ['excel', 'pdf', 'print']
+            }
         }
-    }
+    });
 });
 ```
 
@@ -292,7 +315,7 @@ new DataTable('#myTable', {
 php artisan vendor:publish --tag=datatables-export-config
 ```
 
-File akan muncul di `config/datatables-export.php`. Gunakan ini untuk ganti versi CDN atau URL mirror.
+File akan muncul di `config/datatables-export.php`.
 
 ### Publish views (opsional)
 
@@ -300,7 +323,7 @@ File akan muncul di `config/datatables-export.php`. Gunakan ini untuk ganti vers
 php artisan vendor:publish --tag=datatables-export-views
 ```
 
-Views disalin ke `resources/views/vendor/datatables-export/` untuk kustomisasi tampilan.
+Views disalin ke `resources/views/vendor/datatables-export/`.
 
 ### Semua opsi config
 
@@ -315,6 +338,7 @@ return [
     'cdn' => [
         'datatables_css'   => 'https://cdn.datatables.net/{version}/css/dataTables.dataTables.min.css',
         'buttons_css'      => 'https://cdn.datatables.net/buttons/{buttons_version}/css/buttons.dataTables.min.css',
+        'jquery_js'        => 'https://code.jquery.com/jquery-3.7.1.min.js',
         'datatables_js'    => 'https://cdn.datatables.net/{version}/js/dataTables.min.js',
         'jszip_js'         => 'https://cdnjs.cloudflare.com/ajax/libs/jszip/{jszip_version}/jszip.min.js',
         'pdfmake_js'       => 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/{pdfmake_version}/pdfmake.min.js',
@@ -325,8 +349,6 @@ return [
     ],
 ];
 ```
-
-Placeholder `{version}`, `{buttons_version}`, `{jszip_version}`, `{pdfmake_version}` otomatis diganti sesuai nilai di atas.
 
 ---
 
@@ -359,12 +381,12 @@ Placeholder `{version}`, `{buttons_version}`, `{jszip_version}`, `{pdfmake_versi
 
 ### v1.0.1
 - Component `<x-datatables-export::table />` tidak lagi auto-inject script inisialisasi — script ditulis sendiri oleh user untuk kebebasan konfigurasi penuh
-- JS CDN sekarang di-push via `@pushOnce('scripts')` ke `@stack('scripts')` di layout, bukan di-render inline
+- JS CDN sekarang di-push via `@pushOnce` ke stack terpisah di layout, bukan di-render inline
 - Prop `buttons` dan `exportColumns` dihapus dari component `table`, digantikan prop `class`
 
 ### v1.0.0
 - Rilis pertama
-- Component `<x-datatables-export::scripts />`: muat CDN DataTables v2 + Buttons + JSZip + PDFMake otomatis. CSS inline di head, JS via `@pushOnce` ke stack `scripts`
+- Component `<x-datatables-export::scripts />`: muat CDN DataTables v2 + Buttons + JSZip + PDFMake otomatis
 - Component `<x-datatables-export::table />`: render `<table>` HTML murni dengan prop `id` dan `class`
 - Konfigurasi CDN versi dan URL dapat di-publish dan dikustomisasi via `config/datatables-export.php`
 - Support Laravel 6–12, PHP 7.3+
