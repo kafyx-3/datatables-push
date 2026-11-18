@@ -1,8 +1,8 @@
 {
     "name": "kafyx-3/laravel-datatables-export",
-    "description": "Shortcut DataTables v2 + Export buttons tanpa jQuery untuk Laravel.",
+    "description": "CDN DataTables v2 + tombol Export (Copy, CSV, Excel, PDF, Print) untuk Laravel — tanpa jQuery, satu tag Blade di layout, langsung jalan.",
     "type": "library",
-    "keywords": ["laravel", "datatables", "export", "package"],
+    "keywords": ["laravel", "datatables", "datatables-export", "export", "csv", "excel", "pdf", "print", "blade", "component", "cdn"],
     "license": "MIT",
     "authors": [
         {
