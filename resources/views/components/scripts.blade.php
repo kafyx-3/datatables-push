@@ -26,8 +26,8 @@
 <link rel="stylesheet" href="{{ $urls['datatables_css'] }}">
 <link rel="stylesheet" href="{{ $urls['buttons_css'] }}">
 
-{{-- JS — di-push ke stack 'scripts', @pushOnce agar tidak double-load --}}
-@pushOnce('scripts')
+{{-- JS — di-push ke stack 'datatables-scripts', @pushOnce agar tidak double-load --}}
+@pushOnce('datatables-scripts')
 <script src="{{ $urls['jquery_js'] }}"></script>
 <script src="{{ $urls['datatables_js'] }}"></script>
 <script src="{{ $urls['jszip_js'] }}"></script>

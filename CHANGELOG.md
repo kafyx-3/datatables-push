@@ -7,6 +7,13 @@ versioning mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [v1.1.1] — 2026-11-18
+
+### Fixed
+- JS CDN sekarang di-push ke stack `datatables-scripts` (bukan `scripts`) agar jQuery dan DataTables selalu termuat **sebelum** script inisialisasi dari halaman. Tambahkan `@stack('datatables-scripts')` sebelum `@stack('scripts')` di layout.
+
+---
+
 ## [v1.1.0] — 2026-11-18
 
 ### Added

@@ -90,7 +90,7 @@ composer update kafyx-3/laravel-datatables-export
 
 ## Quick Start
 
-**1. Tambah `<x-datatables-export::scripts />` di layout dan pastikan ada `@stack('scripts')` sebelum `</body>`:**
+**1. Tambah `<x-datatables-export::scripts />` di layout dan pastikan ada `@stack('datatables-scripts')` dan `@stack('scripts')` sebelum `</body>`:**
 
 ```blade
 {{-- resources/views/layouts/app.blade.php --}}
@@ -105,7 +105,8 @@ composer update kafyx-3/laravel-datatables-export
 <body>
     @yield('content')
 
-    @stack('scripts')  {{-- JS CDN muncul di sini, otomatis --}}
+    @stack('datatables-scripts')  {{-- jQuery + DataTables CDN muncul di sini --}}
+    @stack('scripts')             {{-- script inisialisasi halaman muncul di sini --}}
 </body>
 </html>
 ```
@@ -348,6 +349,9 @@ Placeholder `{version}`, `{buttons_version}`, `{jszip_version}`, `{pdfmake_versi
 ---
 
 ## Changelog
+
+### v1.1.1
+- Fix urutan load JS: CDN sekarang di-push ke stack `datatables-scripts` terpisah dari `scripts`, agar jQuery + DataTables selalu termuat sebelum script inisialisasi halaman
 
 ### v1.1.0
 - jQuery 3.7.1 otomatis dimuat via CDN — tidak perlu taruh script jQuery manual di layout
