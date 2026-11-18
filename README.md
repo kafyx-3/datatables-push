@@ -304,7 +304,18 @@ $(document).ready(function () {
     });
 });
 ```
-
+### Tambah Button 
+```js
+$(document).ready(function () {
+      $('#tabelAlat').DataTable({
+          layout: {
+              topStart: {
+                  buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+              }
+          }
+      });
+  });
+```
 ---
 
 ## Konfigurasi
