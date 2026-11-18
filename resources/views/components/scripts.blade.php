@@ -28,6 +28,7 @@
 
 {{-- JS — di-push ke stack 'scripts', @pushOnce agar tidak double-load --}}
 @pushOnce('scripts')
+<script src="{{ $urls['jquery_js'] }}"></script>
 <script src="{{ $urls['datatables_js'] }}"></script>
 <script src="{{ $urls['jszip_js'] }}"></script>
 <script src="{{ $urls['pdfmake_js'] }}"></script>

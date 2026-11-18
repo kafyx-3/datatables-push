@@ -31,6 +31,7 @@ class Scripts extends Component
         $this->urls = [
             'datatables_css'   => $resolve($cdn['datatables_css']),
             'buttons_css'      => $resolve($cdn['buttons_css']),
+            'jquery_js'        => $cdn['jquery_js'],
             'datatables_js'    => $resolve($cdn['datatables_js']),
             'jszip_js'         => $resolve($cdn['jszip_js']),
             'pdfmake_js'       => $resolve($cdn['pdfmake_js']),

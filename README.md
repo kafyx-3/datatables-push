@@ -349,6 +349,10 @@ Placeholder `{version}`, `{buttons_version}`, `{jszip_version}`, `{pdfmake_versi
 
 ## Changelog
 
+### v1.1.0
+- jQuery 3.7.1 otomatis dimuat via CDN — tidak perlu taruh script jQuery manual di layout
+- Key `jquery_js` ditambahkan ke config `cdn` untuk kustomisasi versi/URL jQuery
+
 ### v1.0.1
 - Component `<x-datatables-export::table />` tidak lagi auto-inject script inisialisasi — script ditulis sendiri oleh user untuk kebebasan konfigurasi penuh
 - JS CDN sekarang di-push via `@pushOnce('scripts')` ke `@stack('scripts')` di layout, bukan di-render inline

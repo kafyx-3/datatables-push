@@ -7,6 +7,17 @@ versioning mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [v1.1.0] — 2026-11-18
+
+### Added
+- jQuery 3.7.1 otomatis dimuat via CDN — tidak perlu taruh `<script src="jquery">` manual di layout
+- Key `jquery_js` ditambahkan ke config `cdn` untuk kustomisasi versi/URL jQuery
+
+### Changed
+- Urutan load JS: jQuery → DataTables → JSZip → PDFMake → vfs_fonts → Buttons core → Buttons HTML5 → Buttons Print
+
+---
+
 ## [v1.0.1] — 2026-11-18
 
 ### Changed
