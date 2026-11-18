@@ -1,0 +1,31 @@
+{
+    "name": "kafyx-3/laravel-datatables-export",
+    "description": "Shortcut DataTables v2 + Export buttons tanpa jQuery untuk Laravel.",
+    "type": "library",
+    "keywords": ["laravel", "datatables", "export", "package"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "kafyx-3",
+            "homepage": "https://github.com/kafyx-3/datatables-push"
+        }
+    ],
+    "require": {
+        "php": "^7.3|^8.0",
+        "illuminate/support": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kafyx3\\DataTablesExport\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Kafyx3\\DataTablesExport\\DataTablesExportServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
