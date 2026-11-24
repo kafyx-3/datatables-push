@@ -1,6 +1,6 @@
 # kafyx-3/laravel-datatables-export
 
-> CDN DataTables v2 + jQuery + tombol Export (Copy, CSV, Excel, PDF, Print) untuk Laravel — satu tag Blade di layout, langsung jalan.
+> Package Laravel untuk memuat CDN **DataTables v2 + jQuery + Export Buttons (Copy, CSV, Excel, PDF, Print)** lengkap dengan dukungan tema **Bootstrap 5 & Bootstrap 4** — cukup satu tag Blade di layout.
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/kafyx-3/laravel-datatables-export.svg?style=flat-square)](https://packagist.org/packages/kafyx-3/laravel-datatables-export)
 [![Total Downloads](https://img.shields.io/packagist/dt/kafyx-3/laravel-datatables-export.svg?style=flat-square)](https://packagist.org/packages/kafyx-3/laravel-datatables-export)
@@ -10,41 +10,14 @@
 
 ---
 
-## Apa ini?
+## Fitur Utama
 
-Package ini membuatmu **tidak perlu copy-paste CDN DataTables** di setiap halaman. Cukup taruh `<x-datatables-export::scripts />` sekali di layout — jQuery, DataTables, JSZip, PDFMake, dan semua plugin Buttons termuat otomatis.
-
-Kamu tetap menulis `$('#id').DataTable(...)` sendiri, bebas konfigurasi apapun.
-
-**Sebelum pakai package ini:**
-```html
-<!-- Di setiap halaman, copy-paste ini semua -->
-<link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/3.2.5/css/buttons.dataTables.min.css">
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/3.2.5/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.print.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-```
-
-**Sesudah:**
-```blade
-<x-datatables-export::scripts />
-```
-
----
-
-## Requirement
-
-| Komponen | Versi minimum |
-|---|---|
-| PHP | 7.3 |
-| Laravel | 6.x |
-| illuminate/support | ^6.0 |
+- **Satu Tag Blade** — Tidak perlu copy-paste 10+ link CDN DataTables, jQuery, JSZip, PDFMake, dan Buttons di setiap halaman.
+- **Tema Bootstrap 5 & 4 Built-in** — Tinggal tambah `theme="bootstrap5"` agar pagination, search box, dan tombol export langsung mengikuti style Bootstrap.
+- **Warna Pagination Otomatis** — Atur warna tombol pagination (`« ‹ 1 › »` / Next-Prev) lewat prop `color="primary"` (`success`, `danger`, `warning`, `info`, `dark`) tanpa tulis CSS manual.
+- **Warna Tombol Export Praktis** — Langsung pakai `className: 'btn-primary'`, `'btn-success'`, `'btn-danger'`, dll tanpa ketimpa `btn-secondary` bawaan DataTables.
+- **Anti Double-Load** — JS di-push via `@pushOnce` ke stack terpisah (`datatables-scripts`), aman untuk banyak tabel dalam satu halaman.
+- **Bebas Konfigurasi** — Kamu tetap menulis `$('#id').DataTable(...)` sendiri dengan fleksibilitas penuh.
 
 ---
 
@@ -54,179 +27,61 @@ Kamu tetap menulis `$('#id').DataTable(...)` sendiri, bebas konfigurasi apapun.
 composer require kafyx-3/laravel-datatables-export
 ```
 
-Auto-discovery aktif di Laravel 5.5+. Tidak perlu daftar provider manual.
-
-### Via path lokal (development)
-
-Tambahkan ke `composer.json` project Laravel kamu:
-
-```json
-{
-    "repositories": [
-        {
-            "type": "path",
-            "url": "./packages/kafyx-3/laravel-datatables-export"
-        }
-    ],
-    "require": {
-        "kafyx-3/laravel-datatables-export": "*"
-    }
-}
-```
+### Update ke versi terbaru
 
 ```bash
-composer update kafyx-3/laravel-datatables-export
+composer require kafyx-3/laravel-datatables-export:^1.2
+php artisan view:clear
 ```
 
-### Laravel 5.4 ke bawah — daftarkan manual
-
-```php
-// config/app.php
-'providers' => [
-    Kafyx3\DataTablesExport\DataTablesExportServiceProvider::class,
-],
-```
+> Auto-discovery aktif di Laravel 5.5+. Untuk Laravel 5.4 ke bawah, daftarkan `Kafyx3\DataTablesExport\DataTablesExportServiceProvider::class` di `config/app.php`.
 
 ---
 
 ## Quick Start
 
-**1. Di layout, taruh `<x-datatables-export::scripts />` di `<head>` dan tambahkan dua stack sebelum `</body>`:**
+### 1. Pasang di Layout Utama
+
+Taruh `<x-datatables-export::scripts />` di dalam `<head>` (setelah CSS Bootstrap jika memakai Bootstrap), lalu tambahkan `@stack('datatables-scripts')` **sebelum** `@stack('scripts')` di bawah `<body>`:
 
 ```blade
-{{-- resources/views/layouts/app.blade.php --}}
+{{-- resources/views/layouts/master.blade.php --}}
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'App')</title>
 
-    <x-datatables-export::scripts />  {{-- CSS DataTables termuat di sini --}}
-    {{-- Atau pakai Bootstrap 5: <x-datatables-export::scripts theme="bootstrap5" /> --}}
+    {{-- CSS Bootstrap 5 kamu (jika pakai Bootstrap) --}}
+    <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+
+    {{-- Muat CSS DataTables (pilih salah satu) --}}
+    <x-datatables-export::scripts theme="bootstrap5" color="primary" />
+    {{-- Atau tema default DataTables: <x-datatables-export::scripts /> --}}
 </head>
 <body>
     @yield('content')
 
-    @stack('datatables-scripts')  {{-- jQuery + DataTables JS muncul di sini --}}
-    @stack('scripts')             {{-- script inisialisasi halaman muncul di sini --}}
+    @stack('datatables-scripts')  {{-- jQuery + DataTables + Export JS --}}
+    @stack('scripts')             {{-- Script inisialisasi tabel --}}
 </body>
 </html>
 ```
 
-> **Penting:** `@stack('datatables-scripts')` harus ada **sebelum** `@stack('scripts')` agar jQuery sudah termuat saat script inisialisasi dijalankan.
+> **Penting:** `@stack('datatables-scripts')` wajib berada **di atas** `@stack('scripts')` agar jQuery dan DataTables sudah siap sebelum script halaman dijalankan.
 
-**2. Di halaman, buat tabel dan tulis script inisialisasi di `@push('scripts')`:**
-
-```blade
-@extends('layouts.app')
-
-@section('content')
-    <table id="tabelKu" class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Nama</th>
-                <th>Email</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($data as $item)
-            <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $item->name }}</td>
-                <td>{{ $item->email }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-@endsection
-
-@push('scripts')
-<script>
-$(document).ready(function () {
-    $('#tabelKu').DataTable({
-        layout: {
-            topStart: {
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-            }
-        }
-    });
-});
-</script>
-@endpush
-```
-
----
-
-## Cara Kerja
-
-`<x-datatables-export::scripts />` melakukan dua hal:
-
-- **CSS** — langsung di-render di tempat tag dipasang (cocok di `<head>`)
-- **JS** — di-push ke `@stack('datatables-scripts')` via `@pushOnce`, tidak double-load walau ada beberapa tabel di satu halaman
-
-Urutan load JS yang dijamin oleh package:
-1. jQuery 3.7.1
-2. DataTables core (+ adapter `dataTables.bootstrap5/4.min.js` jika pakai tema Bootstrap)
-3. JSZip (dependency Excel)
-4. PDFMake + vfs_fonts (dependency PDF)
-5. Buttons core (+ adapter `buttons.bootstrap5/4.min.js` jika pakai tema Bootstrap)
-6. Buttons HTML5 (CSV, Excel, Copy)
-7. Buttons Print
-
-`<x-datatables-export::table />` hanya render `<table>` HTML. **Tidak ada script inisialisasi yang otomatis diinjeksi.** Kamu tulis `$('#id').DataTable(...)` sendiri di `@push('scripts')`.
-
----
-
-## Referensi Props
-
-### `<x-datatables-export::scripts />`
-
-Taruh sekali di `<head>` layout.
-
-| Prop | Tipe | Default | Keterangan |
-|---|---|---|---|
-| `theme` | `string` | `default` | Tema styling DataTables & Buttons. Pilihan: `default`, `bootstrap5`, `bootstrap4`. Jika tidak diisi, mengikuti `config('datatables-export.theme')`. |
-| `color` | `string` | `primary` | Warna pagination Bootstrap (`« ‹ 1 › »`). Pilihan: `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `dark`. Berlaku saat `theme` = `bootstrap5` / `bootstrap4`. |
+### 2. Buat Tabel & Script Inisialisasi
 
 ```blade
-{{-- Tema default DataTables --}}
-<x-datatables-export::scripts />
-
-{{-- Tema Bootstrap 5 (pagination biru primary + tombol export support warna btn-*) --}}
-<x-datatables-export::scripts theme="bootstrap5" />
-
-{{-- Tema Bootstrap 5 dengan warna pagination custom (misal hijau) --}}
-<x-datatables-export::scripts theme="bootstrap5" color="success" />
-```
-
-### `<x-datatables-export::table />`
-
-| Prop | Tipe | Default | Keterangan |
-|---|---|---|---|
-| `id` | `string` | — *(wajib)* | ID unik elemen `<table>`. Harus unik per halaman. |
-| `class` | `string` | `display` | Class CSS pada `<table>`. Bisa dikombinasi dengan Bootstrap, dll. |
-
-> `<x-datatables-export::table>` dan `<table>` biasa hasilnya identik di HTML — bebas pilih mana yang lebih nyaman.
-
----
-
-## Contoh
-
-### Tabel lengkap dengan Gambar + Aksi tidak ikut ekspor
-
-```blade
-@extends('layouts.app')
+@extends('layouts.master')
 
 @section('content')
 <div class="container mt-4">
-    <x-datatables-export::table id="tabelAlat" class="table table-bordered table-striped align-middle">
+    <table id="tabelAlat" class="table table-bordered table-striped align-middle">
         <thead>
             <tr>
                 <th>#</th>
                 <th>Nama Alat</th>
-                <th>Gambar Alat</th>
-                <th>Keterangan</th>
                 <th>Kategori</th>
                 <th>Stok</th>
                 <th>Aksi</th>
@@ -237,12 +92,6 @@ Taruh sekali di `<head>` layout.
             <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $a->nama_alat }}</td>
-                <td>
-                    @if ($a->gambar_alat)
-                    <img src="{{ asset('storage/' . $a->gambar_alat) }}" width="80">
-                    @endif
-                </td>
-                <td>{{ $a->keterangan_alat }}</td>
                 <td>{{ $a->kategori->nama_kategori }}</td>
                 <td>{{ $a->stok }}</td>
                 <td>
@@ -252,84 +101,12 @@ Taruh sekali di `<head>` layout.
             </tr>
             @endforeach
         </tbody>
-    </x-datatables-export::table>
+    </table>
 </div>
 @endsection
 
 @push('scripts')
 <script>
-$(document).ready(function () {
-    // Kolom indeks 2 (Gambar) dan 6 (Aksi) tidak ikut ekspor
-    $('#tabelAlat').DataTable({
-        layout: {
-            topStart: {
-                buttons: [
-                    { extend: 'copy',  exportOptions: { columns: [0, 1, 3, 4, 5] } },
-                    { extend: 'csv',   exportOptions: { columns: [0, 1, 3, 4, 5] } },
-                    { extend: 'excel', exportOptions: { columns: [0, 1, 3, 4, 5] } },
-                    { extend: 'pdf',   exportOptions: { columns: [0, 1, 3, 4, 5] } },
-                    { extend: 'print', exportOptions: { columns: [0, 1, 3, 4, 5] } }
-                ]
-            }
-        }
-    });
-});
-</script>
-@endpush
-```
-
-### Custom judul dan nama file ekspor
-
-```js
-$(document).ready(function () {
-    $('#myTable').DataTable({
-        layout: {
-            topStart: {
-                buttons: [
-                    {
-                        extend: 'excel',
-                        text: 'Download Excel',
-                        title: 'Laporan Data Pengguna',
-                        filename: 'laporan-pengguna',
-                        exportOptions: { columns: [0, 1, 2] }
-                    },
-                    {
-                        extend: 'pdf',
-                        text: 'Download PDF',
-                        title: 'Laporan Data Pengguna',
-                        filename: 'laporan-pengguna',
-                        exportOptions: { columns: [0, 1, 2] }
-                    }
-                ]
-            }
-        }
-    });
-});
-```
-
-### Tombol berwarna & Pagination Bootstrap (Bootstrap 5 / Bootstrap 4)
-
-Agar tombol export (**Copy, CSV, Excel, PDF, Print**), **search box**, dan tombol **pagination (`« ‹ 1 › »` / Next-Prev)** otomatis mengikuti style Bootstrap:
-
-**1. Aktifkan tema Bootstrap** (pastikan CSS Bootstrap sudah dimuat di layout):
-
-Cara A — langsung di `<head>` layout:
-```blade
-{{-- Untuk Bootstrap 5 --}}
-<x-datatables-export::scripts theme="bootstrap5" />
-
-{{-- Untuk Bootstrap 4 --}}
-<x-datatables-export::scripts theme="bootstrap4" />
-```
-
-Cara B — set global di `config/datatables-export.php` (setelah `vendor:publish`):
-```php
-'theme' => 'bootstrap5', // 'default' | 'bootstrap5' | 'bootstrap4'
-```
-
-**2. Beri warna per tombol langsung di `@push('scripts')` (tanpa perlu CSS manual):**
-
-```js
 $(document).ready(function () {
     $('#tabelAlat').DataTable({
         layout: {
@@ -345,69 +122,152 @@ $(document).ready(function () {
         }
     });
 });
+</script>
+@endpush
 ```
 
-### Tombol di bawah tabel
+---
+
+## Tema & Warna Bootstrap
+
+Aktifkan tema Bootstrap lewat prop pada `<x-datatables-export::scripts />`:
+
+```blade
+{{-- Bootstrap 5 dengan pagination biru (primary) --}}
+<x-datatables-export::scripts theme="bootstrap5" color="primary" />
+
+{{-- Bootstrap 5 dengan pagination hijau (success) --}}
+<x-datatables-export::scripts theme="bootstrap5" color="success" />
+
+{{-- Bootstrap 4 --}}
+<x-datatables-export::scripts theme="bootstrap4" color="primary" />
+```
+
+Atau set secara global di `config/datatables-export.php` (setelah `vendor:publish`):
+
+```php
+'theme' => 'bootstrap5', // 'default' | 'bootstrap5' | 'bootstrap4'
+'color' => 'primary',    // 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'dark'
+```
+
+Dengan `theme="bootstrap5"`:
+- **Pagination (`« ‹ 1 › »` / Next-Prev)** & **Search box** otomatis mengikuti style Bootstrap 5.
+- **Tombol Export** langsung bisa diberi warna Bootstrap (`btn-primary`, `btn-success`, `btn-danger`, `btn-warning`, `btn-info`, `btn-dark`, `btn-outline-*`) tanpa perlu CSS tambahan.
+
+---
+
+## Referensi Component
+
+### `<x-datatables-export::scripts />`
+
+Taruh sekali di `<head>` layout.
+
+| Prop | Tipe | Default | Pilihan | Keterangan |
+|---|---|---|---|---|
+| `theme` | `string` | `default` | `default`, `bootstrap5`, `bootstrap4` | Tema CSS & adapter JS DataTables + Buttons. |
+| `color` | `string` | `primary` | `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `dark` | Warna pagination Bootstrap (aktif saat `theme` = `bootstrap5` / `bootstrap4`). |
+
+### `<x-datatables-export::table />` *(Opsional)*
+
+Render elemen `<table>` HTML murni tanpa injeksi script.
+
+| Prop | Tipe | Default | Keterangan |
+|---|---|---|---|
+| `id` | `string` | — *(wajib)* | ID unik elemen `<table>`. |
+| `class` | `string` | `display` | Class CSS pada `<table>` (misal `table table-bordered table-striped`). |
+
+---
+
+## Contoh Lainnya
+
+### Kecualikan Kolom (Gambar & Aksi) dari Ekspor
 
 ```js
 $(document).ready(function () {
-    $('#myTable').DataTable({
+    // Kolom indeks 2 (Gambar) dan 6 (Aksi) tidak ikut diekspor
+    const cols = [0, 1, 3, 4, 5];
+
+    $('#tabelAlat').DataTable({
         layout: {
-            topStart: null,
-            bottomStart: {
-                buttons: ['excel', 'pdf', 'print']
+            topStart: {
+                buttons: [
+                    { extend: 'copy',  text: 'Copy',  className: 'btn-secondary', exportOptions: { columns: cols } },
+                    { extend: 'csv',   text: 'CSV',   className: 'btn-primary',   exportOptions: { columns: cols } },
+                    { extend: 'excel', text: 'Excel', className: 'btn-success',   exportOptions: { columns: cols } },
+                    { extend: 'pdf',   text: 'PDF',   className: 'btn-danger',    exportOptions: { columns: cols } },
+                    { extend: 'print', text: 'Print', className: 'btn-info text-white', exportOptions: { columns: cols } }
+                ]
             }
         }
     });
 });
 ```
-### Tambah Button 
+
+### Custom Nama File & Teks Pagination (`Previous` / `Next`)
+
 ```js
 $(document).ready(function () {
-      $('#tabelAlat').DataTable({
-          layout: {
-              topStart: {
-                  buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-              }
-          }
-      });
-  });
+    $('#myTable').DataTable({
+        language: {
+            paginate: {
+                previous: 'Previous',
+                next: 'Next'
+            }
+        },
+        layout: {
+            topStart: {
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: 'Download Excel',
+                        className: 'btn-success',
+                        title: 'Laporan Data Alat',
+                        filename: 'laporan-data-alat'
+                    },
+                    {
+                        extend: 'pdf',
+                        text: 'Download PDF',
+                        className: 'btn-danger',
+                        title: 'Laporan Data Alat',
+                        filename: 'laporan-data-alat'
+                    }
+                ]
+            },
+            bottomEnd: {
+                paging: {
+                    firstLast: false // sembunyikan tombol « dan »
+                }
+            }
+        }
+    });
+});
 ```
+
 ---
 
 ## Konfigurasi
 
-### Publish config
+### Publish Config & Views
 
 ```bash
+# Publish config ke config/datatables-export.php
 php artisan vendor:publish --tag=datatables-export-config
-```
 
-File akan muncul di `config/datatables-export.php`.
-
-### Publish views (opsional)
-
-```bash
+# Publish views ke resources/views/vendor/datatables-export/ (opsional)
 php artisan vendor:publish --tag=datatables-export-views
 ```
 
-Views disalin ke `resources/views/vendor/datatables-export/`.
-
-### Semua opsi config
+### Struktur `config/datatables-export.php`
 
 ```php
-// config/datatables-export.php
 return [
     'datatables_version' => '2.3.4',
     'buttons_version'    => '3.2.5',
     'jszip_version'      => '3.10.1',
     'pdfmake_version'    => '0.2.7',
 
-    // Pilihan tema: 'default', 'bootstrap5', 'bootstrap4'
-    'theme' => 'default',
-
-    // Warna pagination Bootstrap: 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'dark'
-    'color' => 'primary',
+    'theme' => 'default', // 'default' | 'bootstrap5' | 'bootstrap4'
+    'color' => 'primary', // 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'dark'
 
     'themes' => [
         'default' => [
@@ -447,52 +307,25 @@ return [
 
 ---
 
-## Kompatibilitas Laravel
+## Kompatibilitas
 
-| Laravel | PHP | Blade Component | Auto-Discovery | Catatan |
-|---|---|---|---|---|
-| 12.x | 8.2+ | ✅ | ✅ | Full support |
-| 11.x | 8.2+ | ✅ | ✅ | Full support |
-| 10.x | 8.1+ | ✅ | ✅ | Full support |
-| 9.x | 8.0+ | ✅ | ✅ | Full support |
-| 8.x | 7.3+ | ✅ | ✅ | Full support |
-| 7.x | 7.2.5+ | ✅ | ✅ | Full support |
-| 6.x | 7.2+ | ❌ | ✅ | Gunakan `@component` atau publish views |
-| 5.5–5.8 | 7.1+ | ❌ | ✅ | Gunakan `@component` atau publish views |
-| 5.4 ke bawah | 7.0+ | ❌ | ❌ | Daftarkan provider manual di `config/app.php` |
-
-> Blade Component (`<x-...>`) baru tersedia di Laravel 7+. Di Laravel 5–6 gunakan `@component('datatables-export::components.table', ['id' => 'myTable'])`.
+| Laravel | PHP | Blade Component (`<x-...>`) | Auto-Discovery |
+|---|---|---|---|
+| 10.x – 12.x | 8.1+ | ✅ | ✅ |
+| 7.x – 9.x | 7.3+ | ✅ | ✅ |
+| 6.x | 7.3+ | ❌ *(pakai `@component`)* | ✅ |
 
 ---
 
 ## Changelog
 
-### v1.2.1
-- Tambah prop `color` (`primary`, `success`, `danger`, dll) untuk warna pagination Bootstrap otomatis tanpa CSS manual
-- Auto-remove `btn-secondary` bawaan DataTables saat tombol export diberi class warna custom (`btn-primary`, `btn-success`, dll)
+Lihat riwayat lengkap di [CHANGELOG.md](CHANGELOG.md).
 
-### v1.2.0
-- Tambah dukungan tema `bootstrap5` dan `bootstrap4` lewat `<x-datatables-export::scripts theme="bootstrap5" />` atau config `'theme' => 'bootstrap5'`
-- Otomatis memuat CSS & adapter JS Bootstrap untuk pagination, search box, dan tombol export
-
-### v1.1.1
-- Fix urutan load JS: CDN sekarang di-push ke stack `datatables-scripts` terpisah dari `scripts`, agar jQuery + DataTables selalu termuat sebelum script inisialisasi halaman
-
-### v1.1.0
-- jQuery 3.7.1 otomatis dimuat via CDN — tidak perlu taruh script jQuery manual di layout
-- Key `jquery_js` ditambahkan ke config `cdn` untuk kustomisasi versi/URL jQuery
-
-### v1.0.1
-- Component `<x-datatables-export::table />` tidak lagi auto-inject script inisialisasi — script ditulis sendiri oleh user untuk kebebasan konfigurasi penuh
-- JS CDN sekarang di-push via `@pushOnce` ke stack terpisah di layout, bukan di-render inline
-- Prop `buttons` dan `exportColumns` dihapus dari component `table`, digantikan prop `class`
-
-### v1.0.0
-- Rilis pertama
-- Component `<x-datatables-export::scripts />`: muat CDN DataTables v2 + Buttons + JSZip + PDFMake otomatis
-- Component `<x-datatables-export::table />`: render `<table>` HTML murni dengan prop `id` dan `class`
-- Konfigurasi CDN versi dan URL dapat di-publish dan dikustomisasi via `config/datatables-export.php`
-- Support Laravel 6–12, PHP 7.3+
+- **v1.2.1** — Prop `color` untuk warna pagination Bootstrap otomatis + auto-remove `btn-secondary` saat tombol export memakai warna custom.
+- **v1.2.0** — Dukungan tema `bootstrap5` dan `bootstrap4` lewat prop `theme` & config.
+- **v1.1.1** — Stack JS terpisah `datatables-scripts` agar urutan load selalu benar.
+- **v1.1.0** — Auto-load jQuery 3.7.1 via CDN.
+- **v1.0.0** — Rilis awal.
 
 ---
 
