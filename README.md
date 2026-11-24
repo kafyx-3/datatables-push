@@ -102,6 +102,7 @@ composer update kafyx-3/laravel-datatables-export
     <title>@yield('title', 'App')</title>
 
     <x-datatables-export::scripts />  {{-- CSS DataTables termuat di sini --}}
+    {{-- Atau pakai Bootstrap 5: <x-datatables-export::scripts theme="bootstrap5" /> --}}
 </head>
 <body>
     @yield('content')
@@ -166,10 +167,10 @@ $(document).ready(function () {
 
 Urutan load JS yang dijamin oleh package:
 1. jQuery 3.7.1
-2. DataTables core
+2. DataTables core (+ adapter `dataTables.bootstrap5/4.min.js` jika pakai tema Bootstrap)
 3. JSZip (dependency Excel)
 4. PDFMake + vfs_fonts (dependency PDF)
-5. Buttons core
+5. Buttons core (+ adapter `buttons.bootstrap5/4.min.js` jika pakai tema Bootstrap)
 6. Buttons HTML5 (CSV, Excel, Copy)
 7. Buttons Print
 
@@ -302,15 +303,29 @@ $(document).ready(function () {
 });
 ```
 
-### Tombol berwarna dengan Bootstrap 5
+### Tombol berwarna & Pagination Bootstrap (Bootstrap 5 / Bootstrap 4)
 
-Pastikan layout memuat CSS Bootstrap 5 dan gunakan `theme="bootstrap5"`:
+Agar tombol export (**Copy, CSV, Excel, PDF, Print**), **search box**, dan tombol **pagination (`« ‹ 1 › »` / Next-Prev)** otomatis mengikuti style Bootstrap:
 
+**1. Aktifkan tema Bootstrap** (pastikan CSS Bootstrap sudah dimuat di layout):
+
+Cara A — langsung di `<head>` layout:
 ```blade
+{{-- Untuk Bootstrap 5 --}}
 <x-datatables-export::scripts theme="bootstrap5" />
+
+{{-- Untuk Bootstrap 4 --}}
+<x-datatables-export::scripts theme="bootstrap4" />
 ```
 
-Lalu di script inisialisasi, reset `dom.button.className` ke `'btn'` (agar `btn-secondary` bawaan DataTables tidak menimpa warna tombol kamu):
+Cara B — set global di `config/datatables-export.php` (setelah `vendor:publish`):
+```php
+'theme' => 'bootstrap5', // 'default' | 'bootstrap5' | 'bootstrap4'
+```
+
+**2. Beri warna per tombol di `@push('scripts')`:**
+
+> **Penting:** Adapter `buttons.bootstrap5.min.js` memberi class default `btn btn-secondary` ke semua tombol. Reset `dom.button.className` ke `'btn'` (atau `'btn btn-sm'`) agar warna custom (`btn-primary`, `btn-success`, dll) tidak ketimpa abu-abu.
 
 ```js
 $(document).ready(function () {
@@ -392,6 +407,30 @@ return [
     'buttons_version'    => '3.2.5',
     'jszip_version'      => '3.10.1',
     'pdfmake_version'    => '0.2.7',
+
+    // Pilihan tema: 'default', 'bootstrap5', 'bootstrap4'
+    'theme' => 'default',
+
+    'themes' => [
+        'default' => [
+            'datatables_css'      => 'https://cdn.datatables.net/{version}/css/dataTables.dataTables.min.css',
+            'buttons_css'         => 'https://cdn.datatables.net/buttons/{buttons_version}/css/buttons.dataTables.min.css',
+            'datatables_theme_js' => null,
+            'buttons_theme_js'    => null,
+        ],
+        'bootstrap5' => [
+            'datatables_css'      => 'https://cdn.datatables.net/{version}/css/dataTables.bootstrap5.min.css',
+            'buttons_css'         => 'https://cdn.datatables.net/buttons/{buttons_version}/css/buttons.bootstrap5.min.css',
+            'datatables_theme_js' => 'https://cdn.datatables.net/{version}/js/dataTables.bootstrap5.min.js',
+            'buttons_theme_js'    => 'https://cdn.datatables.net/buttons/{buttons_version}/js/buttons.bootstrap5.min.js',
+        ],
+        'bootstrap4' => [
+            'datatables_css'      => 'https://cdn.datatables.net/{version}/css/dataTables.bootstrap4.min.css',
+            'buttons_css'         => 'https://cdn.datatables.net/buttons/{buttons_version}/css/buttons.bootstrap4.min.css',
+            'datatables_theme_js' => 'https://cdn.datatables.net/{version}/js/dataTables.bootstrap4.min.js',
+            'buttons_theme_js'    => 'https://cdn.datatables.net/buttons/{buttons_version}/js/buttons.bootstrap4.min.js',
+        ],
+    ],
 
     'cdn' => [
         'datatables_css'   => 'https://cdn.datatables.net/{version}/css/dataTables.dataTables.min.css',
