@@ -180,28 +180,33 @@ Render elemen `<table>` HTML murni tanpa injeksi script.
 
 ## Contoh Lainnya
 
-### Kecualikan Kolom (Gambar & Aksi) dari Ekspor
+### Kecualikan Kolom (Gambar & Aksi) + Custom Judul Ekspor
+
+Secara default, semua kolom ikut diekspor (termasuk kolom `Aksi` berisi tombol Edit/Delete) dan judul dokumen mengikuti `<title>` halaman. Gunakan `exportOptions.columns` dan `title` untuk merapikannya:
 
 ```js
 $(document).ready(function () {
-    // Kolom indeks 2 (Gambar) dan 6 (Aksi) tidak ikut diekspor
-    const cols = [0, 1, 3, 4, 5];
+    // Index kolom mulai dari 0:
+    // 0: #, 1: Nama Alat, 2: Gambar (skip), 3: Keterangan, 4: Kategori, 5: Stok, 6: Aksi (skip)
+    const exportCols = [0, 1, 3, 4, 5];
 
     $('#tabelAlat').DataTable({
         layout: {
             topStart: {
                 buttons: [
-                    { extend: 'copy',  text: 'Copy',  className: 'btn-secondary', exportOptions: { columns: cols } },
-                    { extend: 'csv',   text: 'CSV',   className: 'btn-primary',   exportOptions: { columns: cols } },
-                    { extend: 'excel', text: 'Excel', className: 'btn-success',   exportOptions: { columns: cols } },
-                    { extend: 'pdf',   text: 'PDF',   className: 'btn-danger',    exportOptions: { columns: cols } },
-                    { extend: 'print', text: 'Print', className: 'btn-info text-white', exportOptions: { columns: cols } }
+                    { extend: 'copy',  text: 'Copy',  className: 'btn-secondary',       title: 'Data Alat', exportOptions: { columns: exportCols } },
+                    { extend: 'csv',   text: 'CSV',   className: 'btn-primary',         title: 'Data Alat', exportOptions: { columns: exportCols } },
+                    { extend: 'excel', text: 'Excel', className: 'btn-success',         title: 'Data Alat', exportOptions: { columns: exportCols } },
+                    { extend: 'pdf',   text: 'PDF',   className: 'btn-danger',          title: 'Data Alat', exportOptions: { columns: exportCols } },
+                    { extend: 'print', text: 'Print', className: 'btn-info text-white', title: 'Data Alat', exportOptions: { columns: exportCols } }
                 ]
             }
         }
     });
 });
 ```
+
+> **Tip:** Jika cuma ingin mengecualikan kolom terakhir (`Aksi`) tanpa menghitung index kolom, cukup ganti `columns: exportCols` menjadi `columns: ':not(:last-child)'`.
 
 ### Custom Nama File & Teks Pagination (`Previous` / `Next`)
 
