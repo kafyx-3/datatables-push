@@ -181,7 +181,19 @@ Urutan load JS yang dijamin oleh package:
 
 ### `<x-datatables-export::scripts />`
 
-Tidak ada props. Taruh sekali di `<head>` layout.
+Taruh sekali di `<head>` layout.
+
+| Prop | Tipe | Default | Keterangan |
+|---|---|---|---|
+| `theme` | `string` | `default` | Tema styling DataTables & Buttons. Pilihan: `default`, `bootstrap5`, `bootstrap4`. Jika tidak diisi, mengikuti `config('datatables-export.theme')`. |
+
+```blade
+{{-- Tema default DataTables --}}
+<x-datatables-export::scripts />
+
+{{-- Tema Bootstrap 5 (pagination, search, & tombol export otomatis style Bootstrap 5) --}}
+<x-datatables-export::scripts theme="bootstrap5" />
+```
 
 ### `<x-datatables-export::table />`
 
@@ -290,6 +302,41 @@ $(document).ready(function () {
 });
 ```
 
+### Tombol berwarna dengan Bootstrap 5
+
+Pastikan layout memuat CSS Bootstrap 5 dan gunakan `theme="bootstrap5"`:
+
+```blade
+<x-datatables-export::scripts theme="bootstrap5" />
+```
+
+Lalu di script inisialisasi, reset `dom.button.className` ke `'btn'` (agar `btn-secondary` bawaan DataTables tidak menimpa warna tombol kamu):
+
+```js
+$(document).ready(function () {
+    $('#tabelAlat').DataTable({
+        layout: {
+            topStart: {
+                buttons: {
+                    dom: {
+                        button: {
+                            className: 'btn btn-sm'
+                        }
+                    },
+                    buttons: [
+                        { extend: 'copy',  text: 'Copy',  className: 'btn-secondary' },
+                        { extend: 'csv',   text: 'CSV',   className: 'btn-primary' },
+                        { extend: 'excel', text: 'Excel', className: 'btn-success' },
+                        { extend: 'pdf',   text: 'PDF',   className: 'btn-danger' },
+                        { extend: 'print', text: 'Print', className: 'btn-info text-white' }
+                    ]
+                }
+            }
+        }
+    });
+});
+```
+
 ### Tombol di bawah tabel
 
 ```js
@@ -371,6 +418,10 @@ return [
 ---
 
 ## Changelog
+
+### v1.2.0
+- Tambah dukungan tema `bootstrap5` dan `bootstrap4` lewat `<x-datatables-export::scripts theme="bootstrap5" />` atau config `'theme' => 'bootstrap5'`
+- Otomatis memuat CSS & adapter JS Bootstrap untuk pagination, search box, dan tombol export
 
 ### v1.1.1
 - Fix urutan load JS: CDN sekarang di-push ke stack `datatables-scripts` terpisah dari `scripts`, agar jQuery + DataTables selalu termuat sebelum script inisialisasi halaman

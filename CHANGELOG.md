@@ -7,6 +7,14 @@ versioning mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [v1.2.0] — 2026-11-24
+
+### Added
+- Dukungan tema Bootstrap 5 & Bootstrap 4 lewat prop `theme` di `<x-datatables-export::scripts theme="bootstrap5" />` atau lewat config `datatables-export.theme` (`default`, `bootstrap5`, `bootstrap4`)
+- Otomatis memuat CSS & adapter JS Bootstrap (`dataTables.bootstrap5.min.js` & `buttons.bootstrap5.min.js`) sehingga pagination (Next/Prev), search box, dan tombol export (Copy, CSV, Excel, PDF, Print) mengikuti style Bootstrap
+
+---
+
 ## [v1.1.1] — 2026-11-18
 
 ### Fixed

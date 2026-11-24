@@ -34,6 +34,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Styling Theme
+    |--------------------------------------------------------------------------
+    | Tema tampilan DataTables & Buttons yang dimuat via CDN.
+    | Pilihan: 'default', 'bootstrap5', 'bootstrap4'
+    |
+    | Bisa juga di-override langsung di Blade component:
+    |   <x-datatables-export::scripts theme="bootstrap5" />
+    */
+    'theme' => 'default',
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Export Buttons
     |--------------------------------------------------------------------------
     | Tombol yang ditampilkan secara default bila prop `buttons` tidak
@@ -41,6 +53,33 @@ return [
     | Pilihan: 'copy', 'csv', 'excel', 'pdf', 'print'
     */
     'default_buttons' => ['copy', 'csv', 'excel', 'pdf', 'print'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Theme CDN URLs
+    |--------------------------------------------------------------------------
+    | CSS & adapter JS untuk masing-masing tema.
+    */
+    'themes' => [
+        'default' => [
+            'datatables_css'      => 'https://cdn.datatables.net/{version}/css/dataTables.dataTables.min.css',
+            'buttons_css'         => 'https://cdn.datatables.net/buttons/{buttons_version}/css/buttons.dataTables.min.css',
+            'datatables_theme_js' => null,
+            'buttons_theme_js'    => null,
+        ],
+        'bootstrap5' => [
+            'datatables_css'      => 'https://cdn.datatables.net/{version}/css/dataTables.bootstrap5.min.css',
+            'buttons_css'         => 'https://cdn.datatables.net/buttons/{buttons_version}/css/buttons.bootstrap5.min.css',
+            'datatables_theme_js' => 'https://cdn.datatables.net/{version}/js/dataTables.bootstrap5.min.js',
+            'buttons_theme_js'    => 'https://cdn.datatables.net/buttons/{buttons_version}/js/buttons.bootstrap5.min.js',
+        ],
+        'bootstrap4' => [
+            'datatables_css'      => 'https://cdn.datatables.net/{version}/css/dataTables.bootstrap4.min.css',
+            'buttons_css'         => 'https://cdn.datatables.net/buttons/{buttons_version}/css/buttons.bootstrap4.min.css',
+            'datatables_theme_js' => 'https://cdn.datatables.net/{version}/js/dataTables.bootstrap4.min.js',
+            'buttons_theme_js'    => 'https://cdn.datatables.net/buttons/{buttons_version}/js/buttons.bootstrap4.min.js',
+        ],
+    ],
 
     /*
     |--------------------------------------------------------------------------
