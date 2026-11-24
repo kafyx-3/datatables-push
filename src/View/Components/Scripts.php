@@ -9,10 +9,16 @@ class Scripts extends Component
     /** Tema yang aktif ('default', 'bootstrap5', 'bootstrap4'). */
     public string $theme;
 
+    /** Warna pagination Bootstrap ('primary', 'success', 'danger', dll). */
+    public string $color;
+
+    /** Apakah tema yang aktif adalah tema Bootstrap. */
+    public bool $isBootstrap;
+
     /** URL-URL CDN yang sudah di-resolve dari config. */
     public array $urls;
 
-    public function __construct(?string $theme = null)
+    public function __construct(?string $theme = null, ?string $color = null)
     {
         $cfg = config('datatables-export');
 
@@ -33,7 +39,12 @@ class Scripts extends Component
             );
         };
 
-        $this->theme = $theme ?? ($cfg['theme'] ?? 'default');
+        $this->theme       = $theme ?? ($cfg['theme'] ?? 'default');
+        $this->isBootstrap = in_array($this->theme, ['bootstrap5', 'bootstrap4'], true);
+
+        $allowedColors = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'dark'];
+        $chosenColor   = $color ?? ($cfg['color'] ?? 'primary');
+        $this->color   = in_array($chosenColor, $allowedColors, true) ? $chosenColor : 'primary';
 
         $cdn      = $cfg['cdn'];
         $themeCdn = $cfg['themes'][$this->theme] ?? null;

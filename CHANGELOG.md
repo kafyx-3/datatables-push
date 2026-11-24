@@ -7,6 +7,14 @@ versioning mengikuti [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [v1.2.1] — 2026-11-24
+
+### Added
+- Prop `color` pada `<x-datatables-export::scripts theme="bootstrap5" color="primary" />` (dan config `datatables-export.color`) untuk mengatur warna pagination Bootstrap (`primary`, `secondary`, `success`, `danger`, `warning`, `info`, `dark`) tanpa tulis CSS manual
+- Auto-remove `btn-secondary` bawaan DataTables saat tombol export diberi class warna custom (`btn-primary`, `btn-success`, `btn-danger`, dll), sehingga user cukup tulis `className: 'btn-primary'` tanpa perlu override `dom.button.className`
+
+---
+
 ## [v1.2.0] — 2026-11-24
 
 ### Added

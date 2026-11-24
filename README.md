@@ -187,13 +187,17 @@ Taruh sekali di `<head>` layout.
 | Prop | Tipe | Default | Keterangan |
 |---|---|---|---|
 | `theme` | `string` | `default` | Tema styling DataTables & Buttons. Pilihan: `default`, `bootstrap5`, `bootstrap4`. Jika tidak diisi, mengikuti `config('datatables-export.theme')`. |
+| `color` | `string` | `primary` | Warna pagination Bootstrap (`« ‹ 1 › »`). Pilihan: `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `dark`. Berlaku saat `theme` = `bootstrap5` / `bootstrap4`. |
 
 ```blade
 {{-- Tema default DataTables --}}
 <x-datatables-export::scripts />
 
-{{-- Tema Bootstrap 5 (pagination, search, & tombol export otomatis style Bootstrap 5) --}}
+{{-- Tema Bootstrap 5 (pagination biru primary + tombol export support warna btn-*) --}}
 <x-datatables-export::scripts theme="bootstrap5" />
+
+{{-- Tema Bootstrap 5 dengan warna pagination custom (misal hijau) --}}
+<x-datatables-export::scripts theme="bootstrap5" color="success" />
 ```
 
 ### `<x-datatables-export::table />`
@@ -323,29 +327,20 @@ Cara B — set global di `config/datatables-export.php` (setelah `vendor:publish
 'theme' => 'bootstrap5', // 'default' | 'bootstrap5' | 'bootstrap4'
 ```
 
-**2. Beri warna per tombol di `@push('scripts')`:**
-
-> **Penting:** Adapter `buttons.bootstrap5.min.js` memberi class default `btn btn-secondary` ke semua tombol. Reset `dom.button.className` ke `'btn'` (atau `'btn btn-sm'`) agar warna custom (`btn-primary`, `btn-success`, dll) tidak ketimpa abu-abu.
+**2. Beri warna per tombol langsung di `@push('scripts')` (tanpa perlu CSS manual):**
 
 ```js
 $(document).ready(function () {
     $('#tabelAlat').DataTable({
         layout: {
             topStart: {
-                buttons: {
-                    dom: {
-                        button: {
-                            className: 'btn btn-sm'
-                        }
-                    },
-                    buttons: [
-                        { extend: 'copy',  text: 'Copy',  className: 'btn-secondary' },
-                        { extend: 'csv',   text: 'CSV',   className: 'btn-primary' },
-                        { extend: 'excel', text: 'Excel', className: 'btn-success' },
-                        { extend: 'pdf',   text: 'PDF',   className: 'btn-danger' },
-                        { extend: 'print', text: 'Print', className: 'btn-info text-white' }
-                    ]
-                }
+                buttons: [
+                    { extend: 'copy',  text: 'Copy',  className: 'btn-secondary' },
+                    { extend: 'csv',   text: 'CSV',   className: 'btn-primary' },
+                    { extend: 'excel', text: 'Excel', className: 'btn-success' },
+                    { extend: 'pdf',   text: 'PDF',   className: 'btn-danger' },
+                    { extend: 'print', text: 'Print', className: 'btn-info text-white' }
+                ]
             }
         }
     });
@@ -411,6 +406,9 @@ return [
     // Pilihan tema: 'default', 'bootstrap5', 'bootstrap4'
     'theme' => 'default',
 
+    // Warna pagination Bootstrap: 'primary', 'secondary', 'success', 'danger', 'warning', 'info', 'dark'
+    'color' => 'primary',
+
     'themes' => [
         'default' => [
             'datatables_css'      => 'https://cdn.datatables.net/{version}/css/dataTables.dataTables.min.css',
@@ -468,6 +466,10 @@ return [
 ---
 
 ## Changelog
+
+### v1.2.1
+- Tambah prop `color` (`primary`, `success`, `danger`, dll) untuk warna pagination Bootstrap otomatis tanpa CSS manual
+- Auto-remove `btn-secondary` bawaan DataTables saat tombol export diberi class warna custom (`btn-primary`, `btn-success`, dll)
 
 ### v1.2.0
 - Tambah dukungan tema `bootstrap5` dan `bootstrap4` lewat `<x-datatables-export::scripts theme="bootstrap5" />` atau config `'theme' => 'bootstrap5'`

@@ -46,6 +46,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Bootstrap Pagination Color
+    |--------------------------------------------------------------------------
+    | Warna pagination (Next/Prev/angka) saat memakai tema 'bootstrap5' atau
+    | 'bootstrap4'. Pilihan: 'primary', 'secondary', 'success', 'danger',
+    | 'warning', 'info', 'dark'.
+    |
+    | Bisa juga di-override langsung di Blade component:
+    |   <x-datatables-export::scripts theme="bootstrap5" color="success" />
+    */
+    'color' => 'primary',
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Export Buttons
     |--------------------------------------------------------------------------
     | Tombol yang ditampilkan secara default bila prop `buttons` tidak
